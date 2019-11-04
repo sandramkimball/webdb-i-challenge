@@ -1,18 +1,17 @@
 const express = require('express');
-
-const db = require('./data/dbConfig.js');
-
+const knex = require('./data/dbConfig.js');
 const server = express();
-
 server.use(express.json());
+
 
 //GET
 server.get('/', (req, res) => {
-    db
-    .select('*')
-    .from('accounts')
-    .then(accounts => {
-        res.status(200).json(accounts);
+    knex
+        .select('*')
+        .from('accounts')
+        .then(accounts => {
+            console.log('Accounts: ', accounts);
+            res.status(200).json({accounts});
     })
     .catch(error=> {
         res.status(500).json({error: 'Failed to get accounts.', error})
@@ -20,7 +19,7 @@ server.get('/', (req, res) => {
 });
 
 server.get('/:id', (req, res) => {
-    db
+    knex
     .select('*')
     .from('accounts')
     .where('id', '=', req.params.id)
@@ -34,7 +33,7 @@ server.get('/:id', (req, res) => {
 
 //POST
 server.post('/', (req, res) => {
-    db
+    knex
     .insert(req.body, 'id')
     .into('accounts')
     .then(ids=> {
@@ -48,7 +47,7 @@ server.post('/', (req, res) => {
 //PUT
 server.put('/:id', (req, res)=> {
     const changes = req.body;
-    db('accounts')
+    knex('accounts')
     .where({id: req.params.id})
     .update(changes)
     .then(count => {
@@ -62,7 +61,7 @@ server.put('/:id', (req, res)=> {
 //DELETE
 server.delete('/:id', (res, req)=> {
     const changes = req.body;
-    db('accounts')
+    knex('accounts')
     .where({id: req.params.id})
     .delete(changes)
     .then(count => {
